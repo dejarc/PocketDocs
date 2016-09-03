@@ -240,7 +240,6 @@ GameEngine.prototype.startInput = function () {
           user_x += 1;
         } else if(e.keyCode === 8) {
           console.log('backspace code ' + e.keyCode);
-          //console.log('backspace was encountered');
           updateData(that,null,user_y,user_x);
           if(user_x > 0 ) {
             user_x--;
