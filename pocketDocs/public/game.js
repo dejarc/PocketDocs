@@ -215,7 +215,6 @@ GameEngine.prototype.startInput = function () {
           user_x = 0;
           user_y++;
         } else if(e.keyCode === 190) {
-          console.log('period code ' + e.keyCode);
           var symbol = '.';
           if(shift) {
             symbol = '>'
@@ -223,7 +222,6 @@ GameEngine.prototype.startInput = function () {
           updateData(that,symbol,user_y,user_x);
           user_x++;
         } else if(e.keyCode === 191) {
-          console.log('slash code ' + e.keyCode);
           var symbol = '/';
           if(shift) {
             symbol = '?';
@@ -231,7 +229,6 @@ GameEngine.prototype.startInput = function () {
           updateData(that,symbol,user_y,user_x);
           user_x++;
         } else if(e.keyCode === 188) {
-          console.log('comma code ' + e.keyCode);
           var symbol = ',';
           if(shift) {
             symbol = '<';
@@ -239,7 +236,6 @@ GameEngine.prototype.startInput = function () {
           updateData(that,symbol,user_y,user_x);
           user_x += 1;
         } else if(e.keyCode === 8) {
-          console.log('backspace code ' + e.keyCode);
           updateData(that,null,user_y,user_x);
           if(user_x > 0 ) {
             user_x--;
@@ -248,8 +244,6 @@ GameEngine.prototype.startInput = function () {
             user_x = that.allLines[user_y].length;
           }
         } else if(e.keyCode === 222) {
-          console.log('Quote code ' + e.keyCode);
-
           var symbol = "'";
           if(shift) {
             symbol = '"';
