@@ -1,6 +1,4 @@
 // This game shell was happily copied from Googler Seth Ladd's "Bad Aliens" game and his Google IO talk in 2011
-var allLines = [];
-var line = '';
 var user_loc = null;
 var GAME_ENGINE = null;
 var ASSET_MANAGER = null;
