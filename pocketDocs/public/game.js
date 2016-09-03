@@ -98,9 +98,6 @@ function removePlayer(player_name) {
         if(temp[index].name === player_name) {//remove the player from the array
           var player = temp.splice(index,1);
           console.log('removing player ' + player.name + ' from the conversation');
-          for(var i = 0; i < temp.length; i++) {
-            console.log('player in conversation ' + temp[i].name);
-          }
         }
       }
     }
@@ -140,7 +137,6 @@ function updateData(game_engine,newData,user_y,user_x) {
         game_engine.allLines[user_y].substring(user_x + 1, game_engine.allLines[user_y].length);
       } else {
         game_engine.allLines[user_y] = newData + game_engine.allLines[user_y];
-        console.log('trying to add data before user is at ' + user_x);
       }
     } else {
       game_engine.allLines[user_y] = game_engine.allLines[user_y].substring(0,user_x) +
@@ -152,7 +148,6 @@ function updateData(game_engine,newData,user_y,user_x) {
         game_engine.line = game_engine.line.substring(0,user_x + 1) + newData +
         game_engine.line.substring(user_x + 1, game_engine.line.length);
       }  else {
-        console.log('trying to add data before user is at ' + user_x);
         game_engine.line = newData + game_engine.line;
       }
     } else {
