@@ -1,0 +1,27 @@
+<div class = "row">
+  <div class="col-md-6">
+
+  </div>
+  <div class="col-md-3">
+  </div>
+  <div class="col-md-2">
+    <!--a style="margin-top:20px" class="btn btn-default" href="#/new/contact">New</a>-->
+  </div>
+  <div class="col-md-1">
+  </div>
+</div>
+<div class="container">
+  <h2>
+    {{getHeaderDisplay()}}
+  </h2>
+  <table class="table table-hover">
+    <tbody>
+      <tr ng-repeat="conversation in conversations" style="cursor:pointer">
+        <td ng-show="convIsActive(conversation)">
+          <a ng-href="#/conversations/{{conversation._id}}" >Title: {{conversation.title}}  Created By: {{conversation.author}}</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <a ng-click="toggleActive()">{{getButtonDisplay()}}</a>
+</div>

@@ -1,0 +1,14 @@
+<div class="container">
+  <h2>
+    Choose your avatar!
+  </h2>
+  <table class="table table-hover">
+    <tbody>
+      <tr ng-repeat="image in images" style="cursor:pointer">
+        <td ng-click="joinConversation(image)">
+            <img ng-src="{{image}}" />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

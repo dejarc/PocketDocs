@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html ng-app="store">
+<head>
+    <meta charset="utf-8">
+    <title id="page panel"></title>
+</head>
+<script src="/nm/angular/angular.min.js"></script>
+<script src="/nm/angular-route/angular-route.min.js"></script>
+<script src="/js/app.js"></script>
+<link rel="stylesheet" href="/nm/bootstrap/dist/css/bootstrap.min.css">
+<script src="/nm/jquery/dist/jquery.min.js"></script>
+<script src="/nm/bootstrap/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="./game.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<body>
+  <nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <div class="navbar-brand" href="#/">Pocket Docs</div>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse" ng-controller="HeaderController as headerCtrl">
+        <ul class="nav navbar-nav">
+          <li ng-class="{active:headerCtrl.isSelected(1)}">
+            <a href="{{headerCtrl.getRedirect()}}" id="myDocs" ng-click="headerCtrl.setTab(1,'My Docs')">My Docs</a>
+          </li>
+          <li ng-class="{active:headerCtrl.isSelected(2)}">
+            <a href="#/" id="openDocs" ng-click="headerCtrl.setTab(2,'Open Docs')" >Open Docs</a>
+          </li>
+          <li ng-class="{active:headerCtrl.isSelected(3)}">
+            <a href="#/createDoc" id="createDoc" ng-click="headerCtrl.setTab(3, 'Create Doc')">Create Doc</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <br></br>
+  <div class="container" ng-view>
+    <script src="/js/clientSocket.js"></script>
+  </div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<div tabindex="1" game-panel-directive>
+  <br></br>
+  <div>
+      <canvas tabindex="1" id="gameWorld" width="500" height="500" style="border: 1px solid brown; background: white"></canvas>
+  </div>
+  <div>
+    <section>
+      <ul class="nav nav-pills">
+        <li ng-class="{active:updateCtrl.isSelected(3)}">
+          <a href ng-click="updateCtrl.setTab(3)">mission </a>
+        </li>
+        <li ng-class="{active:updateCtrl.isSelected(2)}">
+          <a href ng-click="updateCtrl.setTab(2)">description</a>
+        </li>
+        <li ng-class="{active:updateCtrl.isSelected(1)}">
+          <a href ng-click="updateCtrl.setTab(1)">about me</a>
+        </li>
+        <li ng-class="{active:updateCtrl.isSelected(4)}">
+          <a href>other stuff</a>
+        </li>
+      </ul>
+    </section>
+    <section>
+      <div class="panel" ng-show="updateCtrl.isSelected(3)">
+        <h4>mission </h4>
+        <blockquote ng-model="updateCtrl.project.mission">{{updateCtrl.project.mission.length ? updateCtrl.project.mission: updateCtrl.user.project.mission}}</blockquote>
+        <textarea ng-model="updateCtrl.project.mission" ng-show="updateCtrl.editMode()"></textarea>
+      </div>
+      <div class="panel" ng-show="updateCtrl.isSelected(2)">
+        <h4>desciption</h4>
+        <blockquote ng-model="updateCtrl.project.plan">{{updateCtrl.project.plan.length ? updateCtrl.project.plan : updateCtrl.user.project.plan}}</blockquote>
+        <textarea ng-model="updateCtrl.project.plan" ng-show="updateCtrl.editMode()"></textarea>
+      </div>
+      <div class="panel" ng-show="updateCtrl.isSelected(1)">
+        <h4>about me</h4>
+        <blockquote ng-model="updateCtrl.project.about">{{updateCtrl.project.about.length ? updateCtrl.project.about : updateCtrl.user.project.about}}</blockquote>
+        <textarea ng-model="updateCtrl.project.about" ng-show="updateCtrl.editMode()"></textarea>
+      </div>
+      <button ng-click="updateCtrl.setEdit(true)" ng-show="!updateCtrl.editMode()">edit</button>
+      <button ng-click="updateCtrl.updateUser(updateCtrl.user)" ng-show="updateCtrl.editMode()">update</button>
+    </section>
+  </div>
+</div>

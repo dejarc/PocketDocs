@@ -1,0 +1,12 @@
+<div class="card">
+  <h1>{{note.title}}</h1>
+  <p>Created By: {{note.author}}</p>
+  <h3>the project:</h3>
+  <p>{{note.project.mission}}</p>
+  <h3>plan</h3>
+  <p>{{note.project.plan}}</p>
+  <h3>about me:</h3>
+  <p>{{note.project.about}}</p>
+  <button ng-click="joinConversation()">join this</button>
+</div>
+<!--ng-click="#/conversations/{{note._id}}"-->

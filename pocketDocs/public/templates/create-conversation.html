@@ -1,0 +1,34 @@
+<div class="row" ><!--ng-hide="contact._id"-->
+  <div class="col-md-6">
+
+  </div>
+</div>
+<div class="container">
+  <h2>Create a Conversation</h2>
+  <div>
+    <p>
+      <label>title</label>
+      <input id="name" class="form-control" type="text" ng-model="conversation.title" required>
+    </p>
+    <p>
+      <label>mission(what I hope to accomplish)</label>
+      <input id="name" class="form-control" type="text" ng-model="conversation.project.mission" required>
+    </p>
+    <p>
+      <label>description(information about my project)</label>
+      <input id="name" class="form-control" type="text" ng-model="conversation.project.plan" required>
+    </p>
+    <p>
+      <label>about me(a little information)</label>
+      <input id="name" class="form-control" type="text" ng-model="conversation.project.about" required>
+    </p>
+    <p>
+      <label>your name(your name in the conversation)</label>
+      <input id="name" class="form-control" type="text" ng-model="conversation.author" required>
+    </p>
+    <p>
+      <button style="margin-top:20px" class="btn btn-default" ng-click="createConv(conversation)">Save</button>
+      <button style="margin-top:20px" class="btn btn-default" ng-click="back()">Back</button>
+    </p>
+  </div>
+</div>
