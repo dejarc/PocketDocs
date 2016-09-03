@@ -251,7 +251,6 @@ GameEngine.prototype.startInput = function () {
           updateData(that,symbol,user_y,user_x);
           user_x++;
         } else if(e.keyCode > 36 && e.keyCode < 41) {
-          console.log('the arrow key was ' + e.keyCode);
           if(e.keyCode === 37) {
             if(x && x >= 0) {
               if(user_x > 0) {
@@ -445,7 +444,6 @@ function initAssets(prev_data) {
       var ctx = canvas.getContext('2d');
       ctx.font = "15px Georgia";
       var sprite = ASSET_MANAGER.getAsset(prev_data.user_avatar);
-      console.log("the type of the variable " + typeof sprite);
       GAME_ENGINE = new GameEngine();
       var gameboard = new GameBoard();
       GAME_ENGINE.addEntity(gameboard);
@@ -458,7 +456,6 @@ function initAssets(prev_data) {
         console.log('the current players name is ' + prev_data.myName);
         for(var i = 0; i < prev_data.player_data.length; i++) {
           var prev_player = prev_data.player_data[i];
-          console.log(prev_player.name);
           var prev_player_sprite = ASSET_MANAGER.getAsset(prev_player.avatar);
           var nxt_user = new UserSprite(prev_player_sprite,prev_player.data.x,prev_player.data.y,prev_player.name);//testing all users given the same image
           GAME_ENGINE.addEntity(nxt_user);
