@@ -64,6 +64,9 @@ angular.module('store',['ngRoute'])
         controller: 'UpdatePanelController',
         controllerAs:'updateCtrl'
       })
+      .otherwise({
+        redirectTo: "/"
+      })
   })
   .service("Conversations",function($http) {
     console.log('in conversation service');
