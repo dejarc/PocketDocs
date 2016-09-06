@@ -137,7 +137,7 @@ app.post('/createUser',function(req,res) {
   console.log(req.body);
   var newUser = req.body;
   if(!(req.body.email && req.body.username && req.body.password)) {
-    handleError(res, "Invalid Input","Must provide both a title and author");
+    handleError(res, "Invalid Input","Must provide email,username and password");
   } else {
     db.collection(USERS).insertOne(newUser, function(err, doc){
         if(err) {
