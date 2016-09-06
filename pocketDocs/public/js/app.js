@@ -1,6 +1,5 @@
 angular.module('store',['ngRoute'])
   .config(function($routeProvider) {
-    console.log('routeProvider is working');
     $routeProvider
       .when('/createDoc', {
         templateUrl:'templates/create-conversation.html',

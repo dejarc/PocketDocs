@@ -96,9 +96,6 @@ function removePlayer(player_name) {
         if(temp[index].name === player_name) {//remove the player from the array
           var player = temp.splice(index,1);
           console.log('removing player ' + player.name + ' from the conversation');
-          for(var i = 0; i < temp.length; i++) {
-            console.log('player in conversation ' + temp[i].name);
-          }
         }
       }
     }
@@ -138,7 +135,6 @@ function updateData(game_engine,newData,user_y,user_x) {
         game_engine.allLines[user_y].substring(user_x + 1, game_engine.allLines[user_y].length);
       } else {
         game_engine.allLines[user_y] = newData + game_engine.allLines[user_y];
-        console.log('trying to add data before user is at ' + user_x);
       }
     } else {
       game_engine.allLines[user_y] = game_engine.allLines[user_y].substring(0,user_x) +
@@ -150,7 +146,6 @@ function updateData(game_engine,newData,user_y,user_x) {
         game_engine.line = game_engine.line.substring(0,user_x + 1) + newData +
         game_engine.line.substring(user_x + 1, game_engine.line.length);
       }  else {
-        console.log('trying to add data before user is at ' + user_x);
         game_engine.line = newData + game_engine.line;
       }
     } else {
@@ -220,7 +215,6 @@ GameEngine.prototype.startInput = function () {
           user_x = 0;
           user_y++;
         } else if(e.keyCode === 190) {
-          console.log('period code ' + e.keyCode);
           var symbol = '.';
           if(shift) {
             symbol = '>'
@@ -228,7 +222,6 @@ GameEngine.prototype.startInput = function () {
           updateData(that,symbol,user_y,user_x);
           user_x++;
         } else if(e.keyCode === 191) {
-          console.log('slash code ' + e.keyCode);
           var symbol = '/';
           if(shift) {
             symbol = '?';
@@ -236,7 +229,6 @@ GameEngine.prototype.startInput = function () {
           updateData(that,symbol,user_y,user_x);
           user_x++;
         } else if(e.keyCode === 188) {
-          console.log('comma code ' + e.keyCode);
           var symbol = ',';
           if(shift) {
             symbol = '<';
@@ -244,8 +236,6 @@ GameEngine.prototype.startInput = function () {
           updateData(that,symbol,user_y,user_x);
           user_x += 1;
         } else if(e.keyCode === 8) {
-          console.log('backspace code ' + e.keyCode);
-          //console.log('backspace was encountered');
           updateData(that,null,user_y,user_x);
           if(user_x > 0 ) {
             user_x--;
@@ -254,8 +244,6 @@ GameEngine.prototype.startInput = function () {
             user_x = that.allLines[user_y].length;
           }
         } else if(e.keyCode === 222) {
-          console.log('Quote code ' + e.keyCode);
-
           var symbol = "'";
           if(shift) {
             symbol = '"';
@@ -263,7 +251,6 @@ GameEngine.prototype.startInput = function () {
           updateData(that,symbol,user_y,user_x);
           user_x++;
         } else if(e.keyCode > 36 && e.keyCode < 41) {
-          console.log('the arrow key was ' + e.keyCode);
           if(e.keyCode === 37) {
             if(x && x >= 0) {
               if(user_x > 0) {
@@ -457,7 +444,6 @@ function initAssets(prev_data) {
       var ctx = canvas.getContext('2d');
       ctx.font = "15px Georgia";
       var sprite = ASSET_MANAGER.getAsset(prev_data.user_avatar);
-      console.log("the type of the variable " + typeof sprite);
       GAME_ENGINE = new GameEngine();
       var gameboard = new GameBoard();
       GAME_ENGINE.addEntity(gameboard);
@@ -470,7 +456,6 @@ function initAssets(prev_data) {
         console.log('the current players name is ' + prev_data.myName);
         for(var i = 0; i < prev_data.player_data.length; i++) {
           var prev_player = prev_data.player_data[i];
-          console.log(prev_player.name);
           var prev_player_sprite = ASSET_MANAGER.getAsset(prev_player.avatar);
           var nxt_user = new UserSprite(prev_player_sprite,prev_player.data.x,prev_player.data.y,prev_player.name);//testing all users given the same image
           GAME_ENGINE.addEntity(nxt_user);
