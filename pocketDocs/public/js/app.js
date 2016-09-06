@@ -64,6 +64,9 @@ angular.module('store',['ngRoute'])
         controller: 'UpdatePanelController',
         controllerAs:'updateCtrl'
       })
+      .otherwise({
+        redirectTo: "/"
+      })
   })
   .service("Conversations",function($http) {
     console.log('in conversation service');
@@ -286,21 +289,24 @@ angular.module('store',['ngRoute'])
     var saveUser = function(project) {
         Conversations.updateConversation(project);
     };
-    //this.updateConversation =
   })
-  .controller('HeaderController',function($window,User) {
+  .controller('HeaderController',function($window,$scope,User) {
     this.tab = 2;
+    this.next_tab = 2;
+    this.next_title = 'Open Docs';
     $window.document.title = 'Open Docs';
+    var that = this;
+    $scope.$on('$locationChangeSuccess',function(event) {//location changed, change tab
+      that.tab = that.next_tab;//after location change, change tab
+      $window.document.title = that.next_title;//change title
+    });
     this.getRedirect = function() {
       var user_id = User.getUserId();
       return user_id ? '#/myDocs/' + user_id : '#/myDocs/';
     };
     this.setTab = function(myTab,title) {
-      $window.document.title = title;
-      this.tab = myTab;
-      if($window.getSocketId()) {//user is in a conversation, remove
-        $window.remove();
-      }
+      this.next_title = title;
+      this.next_tab = myTab;
     };
     this.isSelected = function(myTab) {
       return this.tab === myTab;
@@ -333,29 +339,42 @@ angular.module('store',['ngRoute'])
       $location.path(conversationUrl);
     }
   })
+  .directive('gameModal',['$window',function($window) {
+    return {
+      restrict:'E',
+      templateUrl:'templates/modals/game-modal.html',
+      link: function(scope,element,attrs) {
+          var next_url = null;//to save the redirect location
+          var modal_elem = {};//hold a reference to the modal
+          var resetUrl = function () {
+            next_url = null;
+          };
+          modal_elem.close = angular.element(element[0].querySelector('#close'));
+          modal_elem.stay = angular.element(element[0].querySelector('#stay'));
+          modal_elem.leave = angular.element(element[0].querySelector('#leave'));
+          modal_elem.close.bind('click',resetUrl);
+          modal_elem.stay.bind('click',resetUrl);
+          modal_elem.leave.bind('click',function() {
+            $window.remove();//remove user from the current conversation
+            $window.location.href = next_url;
+          });
+          scope.$on('$locationChangeStart',function(event,next,current) {//override browser
+            if(next_url) {//user has confirmed, leave page
+              return;
+            }
+            next_url = next;
+            $('#myModal').modal('show');
+            event.preventDefault();//override redirect for confirmation
+          });
+      }
+    };
+  }])
   .directive('gamePanelDirective',['$window', function($window) {
     return {
-      link: function(scope, element) {
+      link: function(scope, element,attrs) {
         element.bind("keydown keypress",function() {
           $window.update();
         });
       }
     };
-  }])
-  .directive('headerPanels',function() {
-    return {
-      restrict:'E',
-      templateUrl:'templates/header-panels.html',
-      controller:function() {
-        console.log('header panels');
-        this.tab = 1;
-        this.setTab = function(myTab) {
-          this.tab = myTab;
-        };
-        this.isSelected = function(myTab) {
-          return this.tab === myTab;
-        };
-      },
-      controllerAs:'header'
-    };
-  });
+  }]);

@@ -62,26 +62,20 @@ function getSocketId() {
   return socket.conversation_id;
 }
 socket.on('player left',function(msg) {
-  if(socket.conversation_id){
-      if(socket.conversation_id === msg.id) {
-        removePlayer(msg.name);
-      }
+  if(socket.conversation_id && (socket.conversation_id === msg.id)) {
+    removePlayer(msg.name);
   }
 });
 socket.on('add_user_asset',function(msg) {
   addAsset(msg);//add asset to existing user
 });
 socket.on('updated_data', function(msg){
-  if(socket.conversation_id) {
-    if(socket.conversation_id === msg.conversation_id) {//users are in the same convesation, update
+  if(socket.conversation_id && (socket.conversation_id === msg.conversation_id)) {
       setData(msg.all_lines,msg.cur_line);
-    }
   }
 });
 socket.on('updated_loc', function(msg){
-  if(socket.conversation_id) {
-    if(socket.conversation_id === msg.conversation_id) {//users are in the same convesation, update
+  if(socket.conversation_id &&( socket.conversation_id === msg.conversation_id)) {//users are in the same convesation, update
       setLocation(msg);
-    }
   }
 });
