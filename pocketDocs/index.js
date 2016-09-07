@@ -47,18 +47,15 @@ function handleError(res, reason, message, code) {
   res.status(code || 500).json({"error": message});
 }
 app.get('/openConv',function(req,res) {
-  console.log('fetching the conversation data');
   db.collection(CONVERSATIONS).find({},{title:true, author:true,player_data:true}).toArray(function(err,docs) {
       if(err) {
         handleError(res,err.message,"failed to get contacts");
       } else {
-        console.log(docs);
         res.status(200).json(docs);
       }
   });
 });
 app.get('/verifyUser',function(req,res) {
-  console.log('the route params passed in were ' + req.query.email);
   if(!req.query.email || (!req.query.password && !req.query.username)) {//user must enter in both email and password or username
     handleError(res, "Invalid Input","Must provide email and username or password");
   } else {
@@ -137,13 +134,12 @@ app.post('/createUser',function(req,res) {
   console.log(req.body);
   var newUser = req.body;
   if(!(req.body.email && req.body.username && req.body.password)) {
-    handleError(res, "Invalid Input","Must provide both a title and author");
+    handleError(res, "Invalid Input","Must provide email, username, and password");
   } else {
     db.collection(USERS).insertOne(newUser, function(err, doc){
         if(err) {
           handleError(res,err.message,'failed to create conversation');
         } else {
-          console.log(doc.ops[0]);
           res.status(201).json(doc.ops[0]);
         }
     });
@@ -167,16 +163,10 @@ io.on('connection', function(client){
   total_users += 1;
   client.on('edit doc',function(msg) {
     client.conversation_id = msg.project_id;
-    if(msg.new_doc) {
-      console.log('new conversation');
-    } else {
-      console.log('old conversation');
-    }
     client.emit('prompt user',msg);
 
   });
   client.on('add user',function(msg) {//insert the user into the current document
-    console.log('users name is ' + msg.user_name);
     if(msg.user_name) {//verify user has set name in the conversation
       db.collection(CONVERSATIONS).update({_id: new ObjectID(client.conversation_id),
       "player_data.name": {$nin:[msg.user_name]}},//verify that the name is not already in the conversation
@@ -201,7 +191,6 @@ io.on('connection', function(client){
           console.log(err);
         } else {
           var temp = res[0];
-          console.log('get data query successful');
           client.emit('data retrieved',{all_lines:temp.conversation.all_lines,
             cur_line:temp.conversation.this_line,
             player_data:temp.player_data,
@@ -229,7 +218,6 @@ io.on('connection', function(client){
         if(err) {
           console.log(err);
         } else {
-          console.log(client.name + ' was removed from the conversation');
           client.broadcast.emit('player left',{name: client.name, id:client.conversation_id});//remove user from conversation
           client.conversation_id = null;
         }
@@ -243,7 +231,6 @@ io.on('connection', function(client){
         if(err) {
           console.log(err);
         } else {
-          console.log(res);
           if(res[0]) {//user disconnected before user location was acquired
             var arr = res[0].player_data;
             var user_data = null;
@@ -251,14 +238,12 @@ io.on('connection', function(client){
             for(var i = 0; i < arr.length; i++) {
               if(arr[i].name === msg.name) {
                 user_data = arr[i];
-                console.log(arr[i]);
-                console.log('was found in the array');
                 break;
-              } else {
-                console.log(arr[i]);
               }
             }
-            client.emit('add_user_asset',user_data);
+            if(user_data) {
+              client.emit('add_user_asset',user_data);
+            }
           }
         }
       });
@@ -287,7 +272,6 @@ io.on('connection', function(client){
       db.collection(CONVERSATIONS).update({_id: new ObjectID(client.conversation_id), "player_data.name": client.name},
       {"$set": {"player_data.$.data": msg}}, function(err,res) {
         if(err) {
-          console.log('new error is here');
           console.log(err);
         } else {
           var updated_location = {name: client.name, location: msg};

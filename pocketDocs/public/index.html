@@ -21,13 +21,13 @@
       <div id="navbar" class="navbar-collapse collapse" ng-controller="HeaderController as headerCtrl">
         <ul class="nav navbar-nav">
           <li ng-class="{active:headerCtrl.isSelected(1)}">
-            <a href="{{headerCtrl.getRedirect()}}" id="myDocs" ng-click="headerCtrl.setTab(1,'My Docs')">My Docs</a>
+            <a href="{{headerCtrl.getRedirect()}}" id="myDocs">My Docs</a>
           </li>
           <li ng-class="{active:headerCtrl.isSelected(2)}">
-            <a href="#/" id="openDocs" ng-click="headerCtrl.setTab(2,'Open Docs')" >Open Docs</a>
+            <a href="#/" id="openDocs">Open Docs</a>
           </li>
           <li ng-class="{active:headerCtrl.isSelected(3)}">
-            <a href="#/createDoc" id="createDoc" ng-click="headerCtrl.setTab(3, 'Create Doc')">Create Doc</a>
+            <a href="#/createDoc" id="createDoc">Create Doc</a>
           </li>
         </ul>
       </div>

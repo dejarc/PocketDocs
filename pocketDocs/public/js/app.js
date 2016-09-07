@@ -21,7 +21,6 @@ angular.module('store',['ngRoute'])
         resolve: {//get the data for all conversations before rendering the page
             conversations: function(Conversations,User) {
               var conv = Conversations.getConversationsbyId(User.getUserId());
-              console.log('returning the conversation ' + conv.data);
               return conv;
             }
         }
@@ -68,11 +67,9 @@ angular.module('store',['ngRoute'])
       })
   })
   .service("Conversations",function($http) {
-    console.log('in conversation service');
     this.getConversations = function() {
       return $http.get("/openConv").
         then(function(res) {
-          console.log('the function returned ' + res);
           return res;
         }, function(res) {
           alert('error finding conversations');
@@ -83,7 +80,6 @@ angular.module('store',['ngRoute'])
       //console.log('the project id is ' + user.project.project_id);
       return $http.get(url).
         then(function(res) {
-          console.log('the function returned ' + res);
           return res;
         }, function(res) {
           alert('error finding conversations');
@@ -91,7 +87,6 @@ angular.module('store',['ngRoute'])
     };
     this.updateConversation = function(project) {
       var url = '/openConv/' + project.project_id;
-      console.log('the url is ' + url);
       return $http.put(url, {mission:project.mission,plan:project.plan,about:project.about}).
         then(function(res) {
           return res;
@@ -103,7 +98,6 @@ angular.module('store',['ngRoute'])
       var url = '/openConv/' + projectId;
       return $http.get(url).
         then(function(res) {
-          console.log('the function returned ' + res);
           return res;
         }, function(res) {
           alert('error finding conversations');
@@ -235,7 +229,6 @@ angular.module('store',['ngRoute'])
       }
       Conversations.createConversation(conversation).then(function(doc){
         if(doc) {
-          console.log('the new document is ' + doc.data.project.mission);
           var user_project = doc.data.project;
           user_project.new_doc = true;
           user_project.author = conversation.author;
@@ -245,7 +238,6 @@ angular.module('store',['ngRoute'])
           $location.path('/chooseAvatar');
         }
       }, function(res) {
-        console.log(res);
         alert(res);
       });
     }
@@ -291,21 +283,23 @@ angular.module('store',['ngRoute'])
   })
   .controller('HeaderController',function($window,$scope,User) {
     this.tab = 2;
-    this.next_tab = 2;
-    this.next_title = 'Open Docs';
     $window.document.title = 'Open Docs';
+    this.tab_route_vals = {};//store the title and tab values for basic routes
+    this.tab_route_vals['/myDocs'] = {tab: 1, doc_title: "My Docs"};
+    this.tab_route_vals['/'] = {tab: 2, doc_title: "Open Docs"};
+    this.tab_route_vals['/chooseAvatar'] = {tab: 2, doc_title: "Open Docs"};
+    this.tab_route_vals['/createDoc'] = {tab: 3, doc_title: "Create Doc"};
     var that = this;
-    $scope.$on('$locationChangeSuccess',function(event) {//location changed, change tab
-      that.tab = that.next_tab;//after location change, change tab
-      $window.document.title = that.next_title;//change title
+    $scope.$on('$routeChangeSuccess',function(event,current,previous) {
+      var route_path = current['$$route']['originalPath'];
+      if(that.tab_route_vals[route_path]) {
+        that.tab = that.tab_route_vals[route_path].tab;//after location change, change tab
+        $window.document.title = that.tab_route_vals[route_path].doc_title;//change title
+      }
     });
     this.getRedirect = function() {
       var user_id = User.getUserId();
       return user_id ? '#/myDocs/' + user_id : '#/myDocs/';
-    };
-    this.setTab = function(myTab,title) {
-      this.next_title = title;
-      this.next_tab = myTab;
     };
     this.isSelected = function(myTab) {
       return this.tab === myTab;
@@ -338,33 +332,56 @@ angular.module('store',['ngRoute'])
       $location.path(conversationUrl);
     }
   })
+  /**handle user leaving a conversation through modal alert and confirmation*/
   .directive('gameModal',['$window',function($window) {
     return {
       restrict:'E',
       templateUrl:'templates/modals/game-modal.html',
       link: function(scope,element,attrs) {
-          var next_url = null;//to save the redirect location
           var modal_elem = {};//hold a reference to the modal
-          var resetUrl = function () {
-            next_url = null;
-          };
-          modal_elem.close = angular.element(element[0].querySelector('#close'));
-          modal_elem.stay = angular.element(element[0].querySelector('#stay'));
+          modal_elem.redir_url = null;
+          var redir_url = null;//to save the redirect location
           modal_elem.leave = angular.element(element[0].querySelector('#leave'));
-          modal_elem.close.bind('click',resetUrl);
-          modal_elem.stay.bind('click',resetUrl);
-          modal_elem.leave.bind('click',function() {
+          modal_elem.leave.bind('click',function() {//user confirm redirect
+            modal_elem.redir_url = redir_url;
             $window.remove();//remove user from the current conversation
-            $window.location.href = next_url;
+            $window.location.href = redir_url;
           });
           scope.$on('$locationChangeStart',function(event,next,current) {//override browser
-            if(next_url) {//user has confirmed, leave page
+            if(modal_elem.redir_url) {//user has confirmed, leave page
               return;
             }
-            next_url = next;
-            $('#myModal').modal('show');
+            $('#myModal').modal({closeExisting: true});
+            redir_url = next;
             event.preventDefault();//override redirect for confirmation
           });
+      }
+    };
+  }])
+  /**to handle user redirects to active conversations*/
+  .directive('openConversationModal',['$window',function($window) {
+    return {
+      restrict:'E',
+      templateUrl:'templates/modals/redirect-modal.html',
+      link: function(scope,element,attrs) {
+        var modal_elem = {};//hold a reference to the modal
+        modal_elem.redir_url = null;
+        var redir_url = null;//hold temp redirect url
+        modal_elem.join = angular.element(element[0].querySelector('#join'));
+        modal_elem.join.bind('click',function() {
+          modal_elem.redir_url = redir_url;
+          $window.location.href = modal_elem.redir_url;
+        });
+        scope.$on('$locationChangeStart',function(event,next,current) {//override browser
+          var redirIntoConv = next.lastIndexOf("joinConversation") >= 0 && current.lastIndexOf("chooseAvatar") < 0;
+          if(!redirIntoConv || modal_elem.redir_url) {//user not attempting redirect
+            return;
+          }
+          $('#redirModal').modal({closeExisting: true});
+          redir_url = current.substring(0, current.lastIndexOf("#") + 1);
+          redir_url += "/chooseAvatar";
+          event.preventDefault();//override redirect for confirmation
+        });
       }
     };
   }])
