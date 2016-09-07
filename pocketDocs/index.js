@@ -76,7 +76,6 @@ app.get('/verifyUser',function(req,res) {
 });
 app.get('/openConv/:id',function(req,res) {
   var temp = req.params.id;
-  console.log('the route params passed in were ' + req.params.id);
   db.collection(CONVERSATIONS).findOne({_id: new ObjectID(req.params.id)},function(err,doc) {
       if(err) {
         handleError(res,err.message,"failed to get contacts");
@@ -91,26 +90,21 @@ app.get('/userConv/:id',function(req,res) {
       if(err) {
         handleError(res,err.message,"failed to get conversations for user");
       } else {
-        console.log(docs);
         res.status(200).json(docs);
       }
   });
 });
 app.put('/openConv/:id', function(req,res) {
-  console.log(req.params);
-  console.log(req.body);
   db.collection(CONVERSATIONS).update({_id: new ObjectID(req.params.id)},
   {"$set": {"project":req.body}}, function(err,res) {
     if(err) {
       console.log(err);
     } else {
-      //res.status(204).end();
       console.log('data inserted');
     }
   });
 });
 app.post('/openConv',function(req,res) {
-  console.log(req.body);
   var newConversation = req.body;
   var conversation = {};
   conversation.all_lines = [];
@@ -124,14 +118,12 @@ app.post('/openConv',function(req,res) {
         if(err) {
           handleError(res,err.message,'failed to create conversation');
         } else {
-          console.log(doc.ops[0]);
           res.status(201).json(doc.ops[0]);
         }
     });
   }
 });
 app.post('/createUser',function(req,res) {
-  console.log(req.body);
   var newUser = req.body;
   if(!(req.body.email && req.body.username && req.body.password)) {
     handleError(res, "Invalid Input","Must provide email, username, and password");
