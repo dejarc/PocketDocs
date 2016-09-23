@@ -20,6 +20,7 @@ function clear_time_loop() {
     clearTimeout(timeout_cont);
   }
 }
+timeout_check(false);//emit initial check
 var start_edit = function (user) {//initialize the user in the conversation
   socket.conversation_id = user.project.project_id;
   if(!all_images) {//set all images if null
@@ -35,7 +36,9 @@ var update = function () {//check whether data has changed
     socket.emit('updated_data',lines);
   }
   var location = getUserLocation();
-  socket.emit('updated_loc', location);
+  if(location) {
+    socket.emit('updated_loc', location);
+  }
 };
 var remove = function() {
   socket.emit('delete user');
@@ -54,16 +57,20 @@ function set_timeout_msg(new_msg) {
 function set_user_modal(modal_trigger) {
   name_modal = modal_trigger;
   name_modal.on('hide.bs.modal', function(e){
+    if(name_modal.validated || name_modal.join_alert) {
+      return;
+    }
     var user_name = $('#name').val();
-    if(!user_name) {
-       e.preventDefault();
-       e.stopImmediatePropagation();
-       console.log('no name was entered for the user');
-       return false;
-     } else {
-       console.log('the name chosen for the user was ' + user_name);
-       send_username(user_name);
-     }
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if(user_name) {
+      console.log('the name chosen for the user was ' + user_name);
+      send_username(user_name);
+    } else {
+      console.log('no name was entered for the user');
+      name_modal.find('#alert').html('please enter a valid name');
+    }
+     return false;
   });
 }
 function send_username(my_name) {
@@ -81,7 +88,6 @@ socket.on('timeout_check',function(msg) {
     clear_time_loop();
   }
 });
-timeout_check(false);//emit initial check
 socket.on('prompt user', function(msg){
     var name = null;
     if(msg.title) {
@@ -92,25 +98,28 @@ socket.on('prompt user', function(msg){
       socket.emit('add user',{user_name: name,user_image: user_avatar});//add the user to the document
     } else {//trigger modal function
       if(name_modal) {
-        if(msg.comment) {
-          clearTimeout(timeout_function);
+        if(msg.comment) {//if value entered was existing username
+          console.log(msg.comment);
+          name_modal.find('#alert').html(msg.comment);
+          /*clearTimeout(timeout_function);
           alert(msg.comment);
-          name_modal.modal({closeExisting: true});
+          name_modal.modal({closeExisting: true});*/
         } else {
-          name_modal.modal({closeExisting: true});
+          //name_modal.checking_valid = true;
+          name_modal.find('#label').html("name:");
+          name_modal.find('#body_title').html("Enter your name in the conversation");
+          name_modal.find('#header_title').html("Enter Name");
+          name_modal.find('#submit').html("Submit");
+          name_modal.modal({closeExisting: false});
         }
       }
-      /*while(!name) {// make sure user has entered name
-        if(msg.comment) {//user has entered an existing name,
-          name = prompt(msg.comment);
-        } else {
-          name = prompt('welcome to the conversation. please enter a name for yourself ');
-        }
-      }*/
     }
-    //socket.emit('add user',{user_name: name,user_image: user_avatar});//add the user to the document
 });
 socket.on('init doc',function() {
+  if(name_modal) {
+    name_modal.validated = true;
+    name_modal.modal('hide');
+  }
   socket.emit('get data');//grab the data
 });
 socket.on('data retrieved',function(msg) {
@@ -122,10 +131,20 @@ socket.on('data retrieved',function(msg) {
 socket.on('join', function(msg){
   if(socket.conversation_id && (msg.conversation_id === socket.conversation_id)) {//if user is in a conversation and the same conversation
       console.log('begin alert');
-      clearTimeout(timeout_function);
-      alert(msg.username + ' has joined.There are now ' + msg.num_users + ' in the conversation');
-      console.log('alert done');
-      socket.emit('get_user_loc',{name: msg.username});
+
+      if(name_modal.validated) {//if user has entered his name, open new modal
+        console.log('alert done');
+        name_modal.find('#name').hide();
+        name_modal.find('#label').html("new user:");
+        name_modal.find('#header_title').html("New User Joined");
+        name_modal.find('#body_title').html(msg.username + " has joined your conversation.There are now " + msg.num_users + " in the conversation.");
+        name_modal.find('#submit').html("Okay");
+        name_modal.join_alert = true;
+        name_modal.modal({closeExisting: true});
+        socket.emit('get_user_loc',{name: msg.username});
+      } else {//if user has not been validated, append to modal alert
+        name_modal.find('#alert').html(msg.username + " has joined your conversation.There are now " + msg.num_users + " in the conversation.");
+      }
   }
 });
 

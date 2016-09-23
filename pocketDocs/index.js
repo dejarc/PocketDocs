@@ -4,7 +4,8 @@ var path = require("path");
 var bodyParser = require("body-parser");
 var app = express();
 var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var io = require('socket.io');
+var socket = io(http);
 var mongodb = require('mongodb');
 var ObjectID = mongodb.ObjectID;
 var total_users = 0;
@@ -151,7 +152,7 @@ function saveMsg(msg) {
     }
 }
 
-io.on('connection', function(client){
+socket.on('connection', function(client){
   console.log('new user connection');
   total_users += 1;
   client.on('edit doc',function(msg) {
@@ -171,7 +172,7 @@ io.on('connection', function(client){
             client.name = msg.user_name;
             client.emit('init doc');//once user has been added, initialize document
           } else {//ask user for name again
-            client.emit('prompt user',{comment: "that name is taken. please enter a unique name"});
+            client.emit('prompt user',{comment: "there is already a user named " + msg.user_name + " in the conversation. please enter a unique name"});
           }
         }
       });

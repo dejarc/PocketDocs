@@ -85,35 +85,40 @@ GameEngine.prototype.start = function () {
     })();
 }
 function setData(myData, myLine) {
+  if(!GAME_ENGINE) {
+    return;
+  }
   GAME_ENGINE.allLines = myData;
   GAME_ENGINE.line = myLine;
 }
 function removePlayer(player_name) {
-  if(GAME_ENGINE) {
-    var temp = GAME_ENGINE.entities;
-    for(var index = temp.length - 1; index > 0; index--) {
-      if(temp[index].name) {
-        if(temp[index].name === player_name) {//remove the player from the array
-          var player = temp.splice(index,1);
-          //console.log('removing player ' + player.name + ' from the conversation');
-        }
+  if(!GAME_ENGINE) {
+    return;
+  }
+  var temp = GAME_ENGINE.entities;
+  for(var index = temp.length - 1; index > 0; index--) {
+    if(temp[index].name) {
+      if(temp[index].name === player_name) {//remove the player from the array
+        var player = temp.splice(index,1);
+        //console.log('removing player ' + player.name + ' from the conversation');
       }
     }
   }
 }
 function setLocation(myLocation) {
+  if(!GAME_ENGINE) {
+    return;
+  }
   var user_info = myLocation.location;
   if(myLocation.name === GAME_ENGINE.name) {
     user_loc = myLocation.location;
   }
-  if(GAME_ENGINE) {
-    var temp = GAME_ENGINE.entities;
-    for(var i = 0; i < temp.length; i++) {
-      if(temp[i].name) {
-        if(temp[i].name === myLocation.name) {
-          temp[i].x = user_info.x;
-          temp[i].y = user_info.y;
-        }
+  var temp = GAME_ENGINE.entities;
+  for(var i = 0; i < temp.length; i++) {
+    if(temp[i].name) {
+      if(temp[i].name === myLocation.name) {
+        temp[i].x = user_info.x;
+        temp[i].y = user_info.y;
       }
     }
   }
@@ -427,6 +432,9 @@ UserSprite.prototype.draw = function (ctx,width, lines) {
   ctx.drawImage(this.img, width + xOffset, (20 * (lines - 1) + 17));
 }
 function addAsset(new_usr) {
+  if(!GAME_ENGINE) {
+    return;
+  }
   var address = new_usr.avatar;
   var sprite = ASSET_MANAGER.getAsset(address);
   var nxt_user = new UserSprite(sprite,new_usr.data.x,new_usr.data.y,new_usr.name);
