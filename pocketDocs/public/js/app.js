@@ -245,7 +245,7 @@ angular.module('store',['ngRoute'])
   .controller('UpdatePanelController',function($window,Conversations,User) {
     this.tab = 1;
     this.user = {project: User.getProject()};
-    $window.start_edit(this.user);//initialize user in the conversation
+    //$window.start_edit(this.user);//initialize user in the conversation
     this.project = {};
     this.canEdit = false;
     var that = this.project;
@@ -355,6 +355,34 @@ angular.module('store',['ngRoute'])
             redir_url = next;
             event.preventDefault();//override redirect for confirmation
           });
+      }
+    };
+  }])
+  .directive('usernameModal',['$window','User',function($window,User) {//alert user of disconnect in the game
+    return {
+      restrict:'E',
+      templateUrl:'templates/modals/username-modal.html',
+      link: function(scope,element,attrs) {
+          var modal_elem = $('#nameModal');
+          $window.set_user_modal(modal_elem);
+          $window.start_edit({project: User.getProject()});//initialize user in the conversation
+      }
+    };
+  }])
+  .directive('disconnectModal',['$window',function($window) {//alert user of disconnect in the game
+    return {
+      restrict:'E',
+      templateUrl:'templates/modals/disconnect-modal.html',
+      link: function(scope,element,attrs) {
+          var modal_elem = {};//hold a reference to the modal
+          var trigger_modal = function() {//trigger function
+            $('#disModal').modal({closeExisting: true});
+          };
+          modal_elem.ignore = angular.element(element[0].querySelector('#ignore'));
+          modal_elem.ignore.bind('click',function() {//user attempting to disregard, send new alert
+            trigger_modal();
+          });
+          $window.set_timeout_msg(trigger_modal);
       }
     };
   }])

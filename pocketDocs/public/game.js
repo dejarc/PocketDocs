@@ -22,7 +22,7 @@ function AssetManager() {
 }
 
 AssetManager.prototype.queueDownload = function (path) {
-    console.log(path.toString());
+    //console.log(path.toString());
     this.downloadQueue.push(path);
 }
 
@@ -36,7 +36,7 @@ AssetManager.prototype.downloadAll = function (callback) {
         var img = new Image();
         var that = this;
         img.addEventListener("load", function () {
-            console.log("dun: " + this.src.toString());
+            //console.log("dun: " + this.src.toString());
             that.successCount += 1;
             if (that.isDone()) { callback(); }
         });
@@ -95,7 +95,7 @@ function removePlayer(player_name) {
       if(temp[index].name) {
         if(temp[index].name === player_name) {//remove the player from the array
           var player = temp.splice(index,1);
-          console.log('removing player ' + player.name + ' from the conversation');
+          //console.log('removing player ' + player.name + ' from the conversation');
         }
       }
     }
@@ -154,7 +154,7 @@ function updateData(game_engine,newData,user_y,user_x) {
   }
 }
 GameEngine.prototype.startInput = function () {
-    console.log('Starting input');
+    //console.log('Starting input');
 
     var getXandY = function (e) {
         var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
@@ -307,7 +307,7 @@ GameEngine.prototype.startInput = function () {
 }
 
 GameEngine.prototype.addEntity = function (entity) {
-    console.log('added entity');
+    //console.log('added entity');
     this.entities.push(entity);
 }
 
@@ -439,7 +439,7 @@ function initAssets(prev_data) {
     ASSET_MANAGER.queueDownload(prev_data.all_images[index]);
   }
   ASSET_MANAGER.downloadAll(function () {
-      console.log("starting up da sheild");
+      //console.log("starting up da sheild");
       var canvas = document.getElementById('gameWorld');
       var ctx = canvas.getContext('2d');
       ctx.font = "15px Georgia";
@@ -453,7 +453,7 @@ function initAssets(prev_data) {
       if(prev_data.conv_exists) {//if previous data exists
         GAME_ENGINE.name = prev_data.myName;
         setData(prev_data.all_lines,prev_data.cur_line);
-        console.log('the current players name is ' + prev_data.myName);
+        //console.log('the current players name is ' + prev_data.myName);
         for(var i = 0; i < prev_data.player_data.length; i++) {
           var prev_player = prev_data.player_data[i];
           var prev_player_sprite = ASSET_MANAGER.getAsset(prev_player.avatar);
@@ -461,7 +461,7 @@ function initAssets(prev_data) {
           GAME_ENGINE.addEntity(nxt_user);
         }
       }
-      console.log("added image asset");
+      //console.log("added image asset");
       GAME_ENGINE.init(ctx);
       GAME_ENGINE.start();
   });

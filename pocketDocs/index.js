@@ -75,7 +75,6 @@ app.get('/verifyUser',function(req,res) {
   }
 });
 app.get('/openConv/:id',function(req,res) {
-  var temp = req.params.id;
   db.collection(CONVERSATIONS).findOne({_id: new ObjectID(req.params.id)},function(err,doc) {
       if(err) {
         handleError(res,err.message,"failed to get contacts");
@@ -132,6 +131,8 @@ app.post('/createUser',function(req,res) {
         if(err) {
           handleError(res,err.message,'failed to create conversation');
         } else {
+          console.log('the returned json object is value is ');
+          console.log(JSON.stringify(doc.ops[0]));
           res.status(201).json(doc.ops[0]);
         }
     });
@@ -194,7 +195,9 @@ io.on('connection', function(client){
         }
       });
   });
-
+  client.on('timeout_check',function(msg) {//notify the client that user they are still connected
+    client.emit('timeout_check',msg);
+  });
   client.on('disconnect', function(){
     total_users -= 1;
     removeUser();
