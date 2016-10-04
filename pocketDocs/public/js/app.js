@@ -57,7 +57,7 @@ angular.module('store',['ngRoute'])
           }
         }
       })
-      .when('/joinConversation/:id', {
+      .when('/activeConversations/:id', {
         templateUrl:'templates/game-panel.html',
         controller: 'UpdatePanelController',
         controllerAs:'updateCtrl'
@@ -111,11 +111,20 @@ angular.module('store',['ngRoute'])
           alert(res.data.error);
         });
     };
+    this.createNameSpace = function(project_id) {//return the absolute path to the conversation
+      return $http.post("/nspCreate",{conv_id:project_id}).
+        then(function(res) {
+          return res;//return the absolute path to the conversation
+        }, function(res) {//connection failed
+          alert('could not find the conversation path');
+        });
+    };
   })
   .factory("User",['$http',function UserFactory($http) {//to track user projects and credentials
       var project = null;
       var user_id = null;
       var project_avatar = null;
+      var project_url = null;
       return {
         setProject : function(newProject) {
           project = newProject;
@@ -151,7 +160,6 @@ angular.module('store',['ngRoute'])
               alert('could not log you in');
             });
         }
-
       };
   }])
   .controller("LoginController",function($location,$scope,User) {
@@ -259,16 +267,11 @@ angular.module('store',['ngRoute'])
       Object.keys(that).forEach(function(key) {
           if(that[key]) {//reset only if values have been set
             user.project[key] = that[key];
-            //console.log(user.project[key]);
           }
       })
       saveUser(user.project);
-      Object.keys(user.project).forEach(function(key) {
-          console.log(user.project[key]);
-      })
       this.project = {};
       that = this.project;
-      console.log('the user is ' + user.project.mission);
       this.setEdit(false);
     };
     this.editMode = function() {
@@ -326,9 +329,8 @@ angular.module('store',['ngRoute'])
     User.saveProjectImages(images.data);
     $scope.images = images.data;
     $scope.joinConversation = function(image_path) {
-      console.log(image_path);
       User.setProjectAvatar(image_path);
-      var conversationUrl = "/joinConversation/" + User.getProject().project_id;
+      var conversationUrl = "/activeConversations/" + User.getProject().project_id;
       $location.path(conversationUrl);
     }
   })
@@ -358,14 +360,23 @@ angular.module('store',['ngRoute'])
       }
     };
   }])
-  .directive('usernameModal',['$window','User',function($window,User) {//alert user of disconnect in the game
+  .directive('usernameModal',['$window','User','Conversations',function($window,User,Conversations) {//alert user of disconnect in the game
     return {
       restrict:'E',
       templateUrl:'templates/modals/username-modal.html',
       link: function(scope,element,attrs) {
-          var modal_elem = $('#nameModal');
-          $window.set_user_modal(modal_elem);
-          $window.start_edit({project: User.getProject()});//initialize user in the conversation
+        var modal_elem = $('#nameModal');
+        Conversations.createNameSpace(User.getProject().project_id).then(function(doc){//get the path to the conversation
+          if(doc.data.active_socket) {//received a confirmation of socket, proceed
+            console.log(doc.data);
+            $window.set_user_modal(modal_elem);
+            $window.start_edit(User.getProject());//initialize user in the conversation
+          } else {
+            alert("couldn't find this conversation");
+          }
+        },function(res) {
+          alert(res);
+        });
       }
     };
   }])
@@ -374,14 +385,14 @@ angular.module('store',['ngRoute'])
       restrict:'E',
       templateUrl:'templates/modals/disconnect-modal.html',
       link: function(scope,element,attrs) {
-          var modal_elem = {};//hold a reference to the modal
+          $('#disModal').on('hide.bs.modal', function(e){
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            return false;
+          });
           var trigger_modal = function() {//trigger function
             $('#disModal').modal({closeExisting: true});
           };
-          modal_elem.ignore = angular.element(element[0].querySelector('#ignore'));
-          modal_elem.ignore.bind('click',function() {//user attempting to disregard, send new alert
-            trigger_modal();
-          });
           $window.set_timeout_msg(trigger_modal);
       }
     };
@@ -401,7 +412,7 @@ angular.module('store',['ngRoute'])
           $window.location.href = modal_elem.redir_url;
         });
         scope.$on('$locationChangeStart',function(event,next,current) {//override browser
-          var redirIntoConv = next.lastIndexOf("joinConversation") >= 0 && current.lastIndexOf("chooseAvatar") < 0;
+          var redirIntoConv = next.lastIndexOf("activeConversations") >= 0 && current.lastIndexOf("chooseAvatar") < 0;
           if(!redirIntoConv || modal_elem.redir_url) {//user not attempting redirect
             return;
           }
