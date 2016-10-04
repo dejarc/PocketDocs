@@ -360,13 +360,13 @@ angular.module('store',['ngRoute'])
       }
     };
   }])
-  .directive('usernameModal',['$window','User','Conversations',function($window,User,Conversations) {//alert user of disconnect in the game
+  .directive('usernameModal',['$window','User','Conversations',function($window,User,Conversations) {//prompt user for name
     return {
       restrict:'E',
       templateUrl:'templates/modals/username-modal.html',
       link: function(scope,element,attrs) {
         var modal_elem = $('#nameModal');
-        Conversations.createNameSpace(User.getProject().project_id).then(function(doc){//get the path to the conversation
+        Conversations.createNameSpace(User.getProject().project_id).then(function(doc){//check for namespace
           if(doc.data.active_socket) {//received a confirmation of socket, proceed
             console.log(doc.data);
             $window.set_user_modal(modal_elem);
